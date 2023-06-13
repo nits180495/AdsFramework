@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "unity": "2021.1",
   "unityRelease": "28f1",
+  "documentationUrl": "https://docs.google.com/document/d/1ppnLAoMviyP26iUjfTypEV_OYMKOouW2kXfbNyBGFxY/edit",
   "displayName": "AdsFramework",
   "description": "AdsFramework can be used for implementing Reward Ads, Interstitial ads and Banner Ads. This framework also support to add test devices.",
   "keywords": [
