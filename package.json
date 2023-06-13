@@ -1,5 +1,5 @@
 {
-  "name": "com.juego.googleads",
+  "name": "com.juego.ads",
   "version": "0.0.1",
   "unity": "2021.1",
   "unityRelease": "28f1",
@@ -14,9 +14,9 @@
   "relatedPackages": {},
   "samples": [
     {
-        "displayName": "Samples",
-        "description": "Sample demo of showing Reward Ads, Interstitial ads and Banner Ads.",
-        "path": "Samples~/SampleAds"
+      "displayName": "Samples",
+      "description": "Sample demo of showing Reward Ads, Interstitial ads and Banner Ads.",
+      "path": "Samples~/SampleAds"
     }
   ]
 }

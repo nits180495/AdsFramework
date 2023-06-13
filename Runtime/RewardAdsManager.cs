@@ -4,19 +4,13 @@ using UnityEngine;
 
 namespace JPackage.AdsFramework
 {
-    public class RewardAdsManager : MonoBehaviour
+    public class RewardAdsManager
     {
         //variable to hold rewardedAd.
         private RewardedAd rewardedAd;
 
-        //Actions to notify what happend after reward Ad is created.
-        public static Action<string, string, double> GrantRewardEvent = delegate { };
-        public static Action OnAdOpeningEvent = delegate { };
-        public static Action OnAdFailedToShowEvent = delegate { };
-        public static Action OnAdClosedEvent = delegate { };
-
         /// <summary>
-        /// Loads the rewarded ad.
+        /// Loads the rewarded ad with the given adsUnitID.
         /// </summary>
         public void LoadRewardedAd(string adsUnitID)
         {
@@ -26,7 +20,6 @@ namespace JPackage.AdsFramework
                 DestroyAd();
             }
 
-            AdsInitializer.PrintLog("Loading the rewarded ad.");
             // create our request used to load the ad.
             var _adRequest = new AdRequest.Builder().Build();
 
@@ -37,16 +30,13 @@ namespace JPackage.AdsFramework
                     // if error is not null, the load request failed.
                     if (_error != null || _ad == null)
                     {
-                        AdsInitializer.PrintLog("Rewarded ad failed to load an ad " +
-                                       "with error : " + _error);
+                        //Error in loading ad
                         return;
                     }
 
-                    AdsInitializer.PrintLog("Rewarded ad loaded with response : "
-                              + _ad.GetResponseInfo());
-
                     rewardedAd = _ad;
 
+                    //Registering Events for Reward Ads
                     RegisterEventHandlers(rewardedAd);
                 });
         }
@@ -64,9 +54,8 @@ namespace JPackage.AdsFramework
                 rewardedAd.Show((Reward reward) =>
                 {
                     // TODO: Reward the user.
-                    AdsInitializer.PrintLog(String.Format(_REWARD_MSG, reward.Type, reward.Amount));
-                    if (GrantRewardEvent != null)
-                        GrantRewardEvent.Invoke(_REWARD_MSG, reward.Type, reward.Amount);
+                    if (AdsEvents.GrantRewardEvent != null)
+                        AdsEvents.GrantRewardEvent.Invoke(_REWARD_MSG, reward.Type, reward.Amount);
                 });
             }
         }
@@ -78,60 +67,42 @@ namespace JPackage.AdsFramework
         /// <param name="ad"></param>
         private void RegisterEventHandlers(RewardedAd ad)
         {
-            // Raised when the ad is estimated to have earned money.
-            ad.OnAdPaid += (AdValue adValue) =>
-            {
-                AdsInitializer.PrintLog(String.Format("Rewarded ad paid {0} {1}.",
-                    adValue.Value,
-                    adValue.CurrencyCode));
-            };
-
-            // Raised when an impression is recorded for an ad.
-            ad.OnAdImpressionRecorded += () =>
-            {
-                AdsInitializer.PrintLog("Rewarded ad recorded an impression.");
-            };
-
             // Raised when a click is recorded for an ad.
             ad.OnAdClicked += () =>
             {
-                AdsInitializer.PrintLog("Rewarded ad was clicked.");
+                if (AdsEvents.OnRewardAdClickedEvent != null)
+                    AdsEvents.OnRewardAdClickedEvent.Invoke();
             };
 
             // Raised when an ad opened full screen content.
             ad.OnAdFullScreenContentOpened += () =>
             {
-                AdsInitializer.PrintLog("Rewarded ad full screen content opened.");
-                if (OnAdOpeningEvent != null)
-                    OnAdOpeningEvent.Invoke();
+                if (AdsEvents.OnRewardAdOpeningEvent != null)
+                    AdsEvents.OnRewardAdOpeningEvent.Invoke();
             };
 
             // Raised when the ad closed full screen content.
             ad.OnAdFullScreenContentClosed += () =>
             {
-                AdsInitializer.PrintLog("Rewarded Ad full screen content closed.");
-                if (OnAdClosedEvent != null)
-                    OnAdClosedEvent.Invoke();
+                if (AdsEvents.OnRewardAdClosedEvent != null)
+                    AdsEvents.OnRewardAdClosedEvent.Invoke();
             };
 
             // Raised when the ad failed to open full screen content.
             ad.OnAdFullScreenContentFailed += (AdError error) =>
             {
-                AdsInitializer.PrintLog("Rewarded ad failed to open full screen content " +
-                               "with error : " + error);
-                if (OnAdFailedToShowEvent != null)
-                    OnAdFailedToShowEvent.Invoke();
+                if (AdsEvents.OnRewardAdFailedToShowEvent != null)
+                    AdsEvents.OnRewardAdFailedToShowEvent.Invoke();
             };
         }
 
         /// <summary>
-        /// Destroys the ad.
+        /// Destroys the ad if it is not null.
         /// </summary>
         public void DestroyAd()
         {
             if (rewardedAd != null)
             {
-                AdsInitializer.PrintLog("Destroying rewarded ad.");
                 rewardedAd?.Destroy();
                 rewardedAd = null;
             }
